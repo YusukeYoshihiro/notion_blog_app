@@ -7,7 +7,6 @@ const notion = new Client({
 
 type Post = {
     id: string;
-    created_time: string,
     properties: {
         Name: {
             title: { plain_text: string }[];
@@ -15,11 +14,9 @@ type Post = {
         Description: {
             rich_text: { plain_text: string }[];
         };
-        // Date: {
-        //     date: {
-        //         start: string;
-        //     };
-        // };
+        Date: {
+            date: { start: string } | null
+        };
         Slug: {
             rich_text: { plain_text: string }[];
         };
@@ -27,14 +24,14 @@ type Post = {
 };
 
 
-const getPageMetaData = (post: any) => {
+
+const getPageMetaData = (post: Post) => {
     return {
         id: post.id,
-        created_time: post.created_time,
-        title: post.properties.Name.title[0].plain_text,
-        description: post.properties.Description.rich_text[0].plain_text,
-        // date: post.properties.Date.date.start,
-        slug: post.properties.Slug.rich_text[0].plain_text,
+        title: post.properties.Name.title[0]?.plain_text,
+        description: post.properties.Description.rich_text[0]?.plain_text,
+        date: post.properties.Date?.date?.start,
+        slug: post.properties.Slug.rich_text[0]?.plain_text,
     }
 }
 
@@ -46,21 +43,25 @@ export const getAllPosts = async () => {
 
     const allPosts = posts.results;
 
-    // return allPosts;
-
     return allPosts.map((post) => {
-        if ("properties" in post){
-            const typedPost: any = {
+        if ("properties" in post
+            && "title" in post.properties.Name
+            && "rich_text" in post.properties.Description
+            && "rich_text" in post.properties.Slug
+            && "date" in post.properties.Date
+        ) {
+            const typedPost: Post = {
                 id: post.id,
-                created_time: post.created_time,
                 properties: {
                     Name: post.properties.Name,
                     Description: post.properties.Description,
-                    // Date: post.properties.Date,
+                    Date: post.properties.Date,
                     Slug: post.properties.Slug,
                 },
             }
             return getPageMetaData(typedPost);
+        } else {
+            return allPosts;
         }
-    })
+    });
 }

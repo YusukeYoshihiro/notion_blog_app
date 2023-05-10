@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import { getAllPosts } from '../lib/notionAPI'
+import { PostfixUnaryExpression } from 'typescript';
 
 // SSG
 export const getStaticProps = async() => {
@@ -14,7 +15,7 @@ export const getStaticProps = async() => {
   }
 }
 
-export default function Home({ allPosts }:any) {
+export default function Home({ allPosts }: any) {
   console.log(allPosts);
   
   return (
