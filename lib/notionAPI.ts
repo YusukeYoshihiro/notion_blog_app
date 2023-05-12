@@ -1,8 +1,12 @@
 import { Client } from '@notionhq/client';
+import { PageObjectResponse, PartialPageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { NotionToMarkdown } from 'notion-to-md';
 
 const notion = new Client({
     auth: process.env.NOTION_TOKEN,
 });
+
+const n2m = new NotionToMarkdown({ notionClient: notion })
 
 export type NotionApiPostResponse = {
     id: string;
@@ -79,24 +83,40 @@ export const getAllPosts = async () => {
     }
 }
 
-export const getSinglePost = async (slug: any ) => {
-    const response = await notion.databases.query({
-        database_id: process.env.NOTION_DATABASE_ID || '',
-        filter: {
-            property: 'Slug',
-            formula: {
-                string: {
-                    equals: slug,
-                }
+/**
+ * Get single post data as metaData, markdownData
+ * @param slug : string
+ * @returns metaData, markdown
+ */
+export const getSinglePost = async (slug: any) => {
+    try {
+        if (slug) {
+            const response = await notion.databases.query({
+                database_id: process.env.NOTION_DATABASE_ID || '',
+                filter: {
+                    property: 'Slug',
+                    formula: {
+                        string: {
+                            equals: slug,
+                        }
+                    }
+                },
+            });
+
+            const page: any = response.results[0];
+            const metaData = getPageMetaData(page);
+        
+            const mdBlocks = await n2m.pageToMarkdown(page.id);
+            const mdString = n2m.toMarkdownString(mdBlocks);
+            // console.log(mdString.parent);
+        
+            return {
+                metaData,
+                markdown: mdString,
             }
-        },
-    });
-
-    const page:any = response.results[0];
-    const metaData = getPageMetaData(page)
-    console.log(metaData);
-
-    return {
-        page,
+        }
+    } catch (error) {
+        console.log(error);
+        throw new Error('slug is not founded');
     }
 };
