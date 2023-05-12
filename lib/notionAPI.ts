@@ -1,6 +1,13 @@
 import { Client } from '@notionhq/client';
-import { PageObjectResponse, PartialPageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { PageObjectResponse, PartialPageObjectResponse, QueryDatabaseResponse, RichTextItemResponse, TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
 import { NotionToMarkdown } from 'notion-to-md';
+import { MdStringObject } from 'notion-to-md/build/types';
+import { NotionApiCustomPost } from '../common/commonType';
+
+interface MetaDataAndMarkdown {
+    metaData: NotionApiCustomPost
+    markdown: MdStringObject
+}
 
 const notion = new Client({
     auth: process.env.NOTION_TOKEN,
@@ -8,75 +15,46 @@ const notion = new Client({
 
 const n2m = new NotionToMarkdown({ notionClient: notion })
 
-export type NotionApiPostResponse = {
-    id: string;
-    properties: {
-        Name: {
-            title: { plain_text: string }[];
-        };
-        Description: {
-            rich_text: { plain_text: string }[];
-        };
-        Date: {
-            date: { start: string } | null
-        };
-        Slug: {
-            rich_text: { plain_text: string }[];
-        };
-        Tags: {
-            multi_select: { name: string }[];
-        }
-    };
-};
-
-const getPageMetaData = (post: NotionApiPostResponse) => {
-    const getTags = (tags: { name: string }[]) => {
-        const allTags = tags.map((tag: { name: string }) => {
-            return tag.name;
-        });
-        return allTags;
-    }
-
-    return {
-        id: post.id,
-        title: post.properties.Name.title[0].plain_text,
-        description: post.properties.Description.rich_text[0].plain_text,
-        date: post.properties.Date?.date?.start,
-        slug: post.properties.Slug.rich_text[0].plain_text,
-        tags: getTags(post.properties.Tags.multi_select),
-    }
+const getTags = (tags: { name: string }[]) => {
+    const allTags = tags.map((tag: { name: string }) => {
+        return tag.name;
+    });
+    return allTags;
 }
 
-export const getAllPosts = async () => {
-
+/**
+ * Get all posts data
+ * @returns Promise<(NotionApiCustomPost | undefined)[]>
+ */
+export const getAllPosts = async (): Promise<(NotionApiCustomPost | undefined)[]> => {
     try {
         const posts = await notion.databases.query({
             database_id: process.env.NOTION_DATABASE_ID || '',
             page_size: 100,
         });
-        const allPosts = posts.results;
+        const allPosts: (PageObjectResponse | PartialPageObjectResponse)[] = posts.results;
 
         return allPosts.map((post) => {
-            if ("properties" in post
+            if (!("properties" in post
                 && "title" in post.properties.Name
                 && "rich_text" in post.properties.Description
                 && "rich_text" in post.properties.Slug
                 && "date" in post.properties.Date
                 && "multi_select" in post.properties.Tags
-            ) {
-                const typedPost: NotionApiPostResponse = {
-                    id: post.id,
-                    properties: {
-                        Name: post.properties.Name,
-                        Description: post.properties.Description,
-                        Date: post.properties.Date,
-                        Slug: post.properties.Slug,
-                        Tags: post.properties.Tags,
-                    },
-                }
-                return getPageMetaData(typedPost);
+            )) {
+                return
             }
-        });
+
+            const typedPost: NotionApiCustomPost = {
+                id: post.id,
+                title: post.properties.Name.title[0].plain_text,
+                description: post.properties.Description.rich_text[0].plain_text,
+                date: post.properties.Date.date?.start,
+                slug: post.properties.Slug.rich_text[0].plain_text,
+                tags: getTags(post.properties.Tags.multi_select),
+            }
+            return typedPost;
+        })
     } catch (error) {
         console.log(error);
         throw new Error("Failed to retrieved posts from Notion API.")
@@ -84,36 +62,55 @@ export const getAllPosts = async () => {
 }
 
 /**
- * Get single post data as metaData, markdownData
+ * Get single post data as metaData AND markdownData
  * @param slug : string
- * @returns metaData, markdown
+ * @returns Promise<MetaDataAndMarkdown | undefined>
  */
-export const getSinglePost = async (slug: any) => {
+export const getSinglePost = async (slug: string): Promise<MetaDataAndMarkdown | undefined> => {
     try {
-        if (slug) {
-            const response = await notion.databases.query({
-                database_id: process.env.NOTION_DATABASE_ID || '',
-                filter: {
-                    property: 'Slug',
-                    formula: {
-                        string: {
-                            equals: slug,
-                        }
-                    }
-                },
-            });
+        if (!slug) {
+            return
+        }
 
-            const page: any = response.results[0];
-            const metaData = getPageMetaData(page);
-        
-            const mdBlocks = await n2m.pageToMarkdown(page.id);
-            const mdString = n2m.toMarkdownString(mdBlocks);
-            // console.log(mdString.parent);
-        
-            return {
-                metaData,
-                markdown: mdString,
-            }
+        const response = await notion.databases.query({
+            database_id: process.env.NOTION_DATABASE_ID || '',
+            filter: {
+                property: 'Slug',
+                formula: {
+                    string: {
+                        equals: slug,
+                    }
+                }
+            },
+        });
+
+        const page: PageObjectResponse | PartialPageObjectResponse = response.results[0];
+
+        if (!("properties" in page
+            && "title" in page.properties.Name
+            && "rich_text" in page.properties.Description
+            && "rich_text" in page.properties.Slug
+            && "date" in page.properties.Date
+            && "multi_select" in page.properties.Tags)
+        ) {
+            return
+        }
+
+        const metaData = {
+            id: page.id,
+            title: page.properties.Name.title[0].plain_text,
+            description: page.properties.Description.rich_text[0].plain_text,
+            date: page.properties.Date.date?.start,
+            slug: page.properties.Slug.rich_text[0].plain_text,
+            tags: getTags(page.properties.Tags.multi_select),
+        }
+
+        const mdBlocks = await n2m.pageToMarkdown(page.id);
+        const mdString = n2m.toMarkdownString(mdBlocks);
+
+        return {
+            metaData: metaData,
+            markdown: mdString,
         }
     } catch (error) {
         console.log(error);

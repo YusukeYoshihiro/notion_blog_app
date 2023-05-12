@@ -1,16 +1,8 @@
 import Link from 'next/link';
 import React from 'react'
+import { NotionApiCustomPost } from '../../common/commonType';
 
-export type PropsPost = {
-    id: string;
-    title: string;
-    description: string;
-    date: string;
-    tags: string[];
-    slug: string;
-};
-
-const SinglePost = (props: PropsPost) => {
+const SinglePost: React.FC<NotionApiCustomPost> = (props: NotionApiCustomPost) => {
     const {
         id,
         title,
