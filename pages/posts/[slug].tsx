@@ -1,37 +1,17 @@
 import React from 'react'
 import { getAllPosts, getSinglePost } from '../../lib/notionAPI'
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext, InferGetStaticPropsType, NextPage } from 'next';
+import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import Link from 'next/link';
 import { ParsedUrlQuery } from 'querystring';
-
-const data = [
-    {
-        id: '6bb941a1-77e1-4093-98ce-31bb4eeeb741',
-        title: '4回目の投稿です',
-        description: 'これは4回目の投稿です。',
-        date: '2023-05-09',
-        slug: 'fourth-post',
-        tags: ['blog', 'Typescript', 'tailwindCSS']
-    },
-    {
-        id: '112fb3e1-c691-467f-8235-3ae92ae8ab2e',
-        title: '3回目の投稿です',
-        description: 'これは3回目の投稿です。',
-        date: '2023-05-09',
-        slug: 'third-post',
-        tags: ['blog', 'Typescript']
-    }];
+import { MdStringObject } from 'notion-to-md/build/types';
+import { NotionApiCustomPost } from '../../common/commonType';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const allPosts = await getAllPosts();
-    console.log('allPosts', allPosts);
-
-    const paths = allPosts.map(({slug}: any) => ({ params: { slug } }));
-    console.log('Paths', paths);
-    
+    const posts = await getAllPosts();
+    const paths = posts.map((post) => ({ params: { slug: post?.slug } }));
 
     return {
         paths: paths,
@@ -50,7 +30,7 @@ interface PramsSlug extends ParsedUrlQuery {
  */
 export const getStaticProps: GetStaticProps = async ({ params }) => {
     const { slug } = params as PramsSlug;
-    // post を取得するために外部 API をコールします。
+
     const post = await getSinglePost(slug);
 
     return {
@@ -61,10 +41,16 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     };
 }
 
-type NextPageProps = InferGetStaticPropsType<typeof getStaticProps>;
+type PostProps = {
+    post: {
+        metaData: NotionApiCustomPost
+        markdown: MdStringObject
+    }
+}
 
-const Post: NextPage<NextPageProps> = ({ post }: NextPageProps) => {
+const Post: NextPage<PostProps> = ({ post }: PostProps) => {
     const { metaData, markdown } = post
+
     return (
         <section className="container lg:px-5 px-5 h-screen lg:w-2/5 mx-auto mt-20">
             <h2 className="w-full text-2xl font-medium">{metaData.title}</h2>
