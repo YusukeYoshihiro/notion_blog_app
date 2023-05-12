@@ -16,10 +16,6 @@ export const getStaticProps = async () => {
 }
 
 export default function Home({ allPosts }: any) {
-  console.log(allPosts);
-  allPosts.map((post: PropsPost) => {
-    return console.log(post.tags);
-  });
 
   return (
     <>
