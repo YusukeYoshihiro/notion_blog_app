@@ -3,7 +3,6 @@ import { getAllPosts } from '../lib/notionAPI'
 import SinglePost from '../components/Post/SinglePost';
 import { GetStaticProps } from 'next';
 import { NotionApiCustomPost } from '../common/commonType';
-import { FC } from 'react';
 
 interface HomeProps {
   allPosts: NotionApiCustomPost[]
