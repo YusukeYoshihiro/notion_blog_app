@@ -9,6 +9,10 @@ import { ParsedUrlQuery } from 'querystring';
 import { MdStringObject } from 'notion-to-md/build/types';
 import { NotionApiCustomPost } from '../../common/commonType';
 
+interface PramsSlug extends ParsedUrlQuery {
+    slug: string;
+}
+
 export const getStaticPaths: GetStaticPaths = async () => {
     const posts = await getAllPosts();
     const paths = posts.map((post) => ({ params: { slug: post?.slug } }));
@@ -19,12 +23,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
     }
 }
 
-interface PramsSlug extends ParsedUrlQuery {
-    slug: string;
-}
-
 /**
- *  この関数はサーバー側のビルド時に呼び出されます。クライアント側では呼び出されないので、直接データベースクエリを実行できます。
+ *  この関数はサーバー側のビルド時に呼び出されます。
+ *  クライアント側では呼び出されないので、直接データベースクエリを実行できます。
  * @param params GetStaticPropsContext
  * @returns post
  */
