@@ -4,6 +4,7 @@ import { NotionToMarkdown } from 'notion-to-md';
 import { MdStringObject } from 'notion-to-md/build/types';
 import { NotionApiCustomPost } from '../common/commonType';
 import { NUMBER_OF_POSTS_PER_PAGE } from '../constants/constants';
+import { log } from 'console';
 
 interface MetaDataAndMarkdown {
     metaData: NotionApiCustomPost
@@ -160,3 +161,20 @@ export const getNumberOfPage = async () => {
         getNumberOfPage
     )
 }
+
+/**
+ * タグごとにページを取得
+ */
+export const getPostsByTagAndPage = async (tagName: string, page: number) => {
+    const allPosts = await getAllPosts();
+    const filteredPosts = allPosts.filter((post) => {
+        return post?.tags.find((tag: string) => tag === tagName)
+    });
+
+    console.log('filteredPost', filteredPosts);
+
+    const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
+    const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
+
+    return filteredPosts.slice(startIndex, endIndex);
+} 

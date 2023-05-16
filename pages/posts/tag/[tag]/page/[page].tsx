@@ -1,60 +1,49 @@
 import Head from 'next/head'
-import { getAllPosts, getNumberOfPage, getPostsByPage, getPostsForTopPage } from '../../../lib/notionAPI'
-import SinglePost from '../../../components/Post/SinglePost';
+import { getAllPosts, getNumberOfPage, getPostsByPage, getPostsByTagAndPage, getPostsForTopPage } from '../../../../../lib/notionAPI'
+import SinglePost from '../../../../../components/Post/SinglePost';
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from 'next';
-import { NotionApiCustomPost } from '../../../common/commonType';
-import Pagination from '../../../components/Pagination/Pagination';
+import { NotionApiCustomPost } from '../../../../../common/commonType';
+import Pagination from '../../../../../components/Pagination/Pagination';
+import { log } from 'console';
 
 interface HomeProps {
     allPosts: NotionApiCustomPost[],
-    postsByPage: NotionApiCustomPost[],
+    postsByTag: NotionApiCustomPost[],
     numberOfPage: number,
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const numberOfPage = await getNumberOfPage();
-
-    /**
-     *  [
-            { params: { page: '1' } }, 
-            { params: { page: '2' } },
-            { params: { page: '3' } },
-            ......
-        ],
-     */
-    let params = [];
-    for (let i = 1; i <= numberOfPage; i++) {
-        params.push({ params: { page: i.toString() } })
-
-    }
 
     return {
-        paths: params,
+        paths: [{ params: { tag: 'blog', page: '1' } },],
         fallback: 'blocking'
     }
 }
 
 // SSG
 export const getStaticProps: GetStaticProps = async (context: GetStaticPropsContext) => {
-    const currentPage = context.params?.page;
+    const currentPage = context.params?.page?.toString();
 
-    const postsByPage = await getPostsByPage(
-        parseInt(currentPage!.toString(), 10)
+    const currentTag = context.params?.tag?.toString();
+    
+    const upperCaseCurrentTag =
+        currentTag?.charAt(0).toUpperCase() + currentTag!.slice(1);
+    
+    const postsByTag = await getPostsByTagAndPage(
+        upperCaseCurrentTag,
+        parseInt(currentPage!, 10)
     );
-
-    const numberOfPage = await getNumberOfPage();
 
     return {
         props: {
-            postsByPage,
-            numberOfPage,
+            postsByTag,
         },
         // ISR 60秒毎に再更新する。※今回は6時間毎
         revalidate: 60 * 60 * 6,
     }
 }
 
-const BlogPageList: React.FC<HomeProps> = ({ postsByPage, numberOfPage }: HomeProps) => {
+const BlogTagPageList: React.FC<HomeProps> = ({ postsByTag, numberOfPage }: HomeProps) => {
 
     return (
         <>
@@ -69,7 +58,7 @@ const BlogPageList: React.FC<HomeProps> = ({ postsByPage, numberOfPage }: HomePr
                 <main className="container w-full mt-16">
                     <h1 className="text-5xl font-medium text-center mb-16">Notion Blog 📒</h1>
                     <section className="sm:grid grid-cols-2 w-5/6 gap-3 mx-auto">
-                        {postsByPage.map((post) => (
+                        {postsByTag.map((post) => (
                             <div key={post.id}>
                                 <SinglePost
                                     id={post.id}
@@ -90,4 +79,4 @@ const BlogPageList: React.FC<HomeProps> = ({ postsByPage, numberOfPage }: HomePr
     )
 }
 
-export default BlogPageList;
+export default BlogTagPageList;

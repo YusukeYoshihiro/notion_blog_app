@@ -52,7 +52,7 @@ const Home: React.FC<HomeProps> = (props: HomeProps) => {
           ))}
           <Link 
           href={`/posts/page/1`} 
-          className='mb-8 text-left'
+          className='mb-6 lg:w-1/2 mx-auto px-5 block text-right'
           >
             ...もっと見る
           </Link>
