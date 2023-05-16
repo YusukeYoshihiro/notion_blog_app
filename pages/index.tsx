@@ -1,8 +1,9 @@
 import Head from 'next/head'
-import { getAllPosts } from '../lib/notionAPI'
+import { getAllPosts, getPostsForTopPage } from '../lib/notionAPI'
 import SinglePost from '../components/Post/SinglePost';
 import { GetStaticProps } from 'next';
 import { NotionApiCustomPost } from '../common/commonType';
+import Link from 'next/link';
 
 interface HomeProps {
   allPosts: NotionApiCustomPost[]
@@ -10,7 +11,7 @@ interface HomeProps {
 
 // SSG
 export const getStaticProps: GetStaticProps = async () => {
-  const allPosts = await getAllPosts();
+  const allPosts = await getPostsForTopPage(4);
 
   return {
     props: {
@@ -45,9 +46,16 @@ const Home: React.FC<HomeProps> = (props: HomeProps) => {
                 date={post.date}
                 tags={post.tags}
                 slug={post.slug}
+                isPaginationPage={false}
               />
             </div>
           ))}
+          <Link 
+          href={`/posts/page/1`} 
+          className='mb-8 text-left'
+          >
+            ...もっと見る
+          </Link>
         </main>
       </div>
     </>

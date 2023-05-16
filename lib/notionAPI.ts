@@ -3,6 +3,7 @@ import { PageObjectResponse, PartialPageObjectResponse, QueryDatabaseResponse, R
 import { NotionToMarkdown } from 'notion-to-md';
 import { MdStringObject } from 'notion-to-md/build/types';
 import { NotionApiCustomPost } from '../common/commonType';
+import { NUMBER_OF_POSTS_PER_PAGE } from '../constants/constants';
 
 interface MetaDataAndMarkdown {
     metaData: NotionApiCustomPost
@@ -117,3 +118,45 @@ export const getSinglePost = async (slug: string): Promise<MetaDataAndMarkdown |
         throw new Error('slug is not founded');
     }
 };
+
+/**
+ * Topページ用記事の取得
+ * @param pageSize : number
+ * @returns Promise<(NotionApiCustomPost | undefined)[]>
+ */
+export const getPostsForTopPage = async (pageSize: number): Promise<(NotionApiCustomPost | undefined)[]> => {
+    const allPosts = await getAllPosts();
+    const TopPagePosts = allPosts.slice(0, pageSize);
+    return TopPagePosts
+}
+
+/**
+ * ページ番号に応じた記事の取得
+ * @param page : number
+ * @returns Promise<(NotionApiCustomPost | undefined)[]>
+ */
+export const getPostsByPage = async (page: number): Promise<(NotionApiCustomPost | undefined)[]> => {
+    const allPosts = await getAllPosts();
+
+    const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
+    const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
+
+    return allPosts.slice(startIndex, endIndex);
+}
+
+/**
+ * 動的にページを取得
+ * @returns number
+ */
+export const getNumberOfPage = async () => {
+    const allPosts = await getAllPosts();
+
+    const totalPosts = allPosts.length
+
+    const getNumberOfPage = Math.floor(totalPosts / NUMBER_OF_POSTS_PER_PAGE)
+        + (totalPosts % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
+
+    return (
+        getNumberOfPage
+    )
+}

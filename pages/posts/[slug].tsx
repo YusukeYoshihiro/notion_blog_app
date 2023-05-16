@@ -58,8 +58,8 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
             <div className="border-b-2 w-1/3 mt-1 border-teal-900"></div>
             <span className="text-gray-500">Post date at {metaData.date}</span>
             <br />
-            {metaData.tags.map((tag: string) => (
-                <p key={tag} className="text-white bg-teal-900 rounded-xl font-medium mt-2 px-2 inline-block mr-2">{tag}</p>
+            {metaData.tags.map((tag: string, index: number) => (
+                <p key={index} className="text-white bg-teal-900 rounded-xl font-medium mt-2 px-2 inline-block mr-2">{tag}</p>
             ))}
 
             <div className="mt-10 font-medium">
