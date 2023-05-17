@@ -1,10 +1,9 @@
 import Head from 'next/head'
-import { getAllPosts, getNumberOfPage, getPostsByPage, getPostsByTagAndPage, getPostsForTopPage } from '../../../../../lib/notionAPI'
+import { getAllPosts, getAllTags, getNumberOfPage, getNumberOfPagesByTag, getPostsByPage, getPostsByTagAndPage, getPostsForTopPage } from '../../../../../lib/notionAPI'
 import SinglePost from '../../../../../components/Post/SinglePost';
 import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from 'next';
 import { NotionApiCustomPost } from '../../../../../common/commonType';
 import Pagination from '../../../../../components/Pagination/Pagination';
-import { log } from 'console';
 
 interface HomeProps {
     allPosts: NotionApiCustomPost[],
@@ -13,6 +12,25 @@ interface HomeProps {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+    const tags = getAllTags();
+
+    const numberOfPageByTag = await getNumberOfPagesByTag('Blog');
+
+    /**
+     *  [
+            { params: { tag: 'blog', page: '1' },
+            { params: { tag: 'blog', page: '2' },
+            { params: { tag: 'blog', page: '3' },
+            ......
+        ],
+     */
+    let params = [];
+    for (let i = 1; i <= numberOfPageByTag; i++) {
+        params.push({ params: { tag: 'Blog', page: i.toString() } })
+
+    }
+    // console.log(params);
+
 
     return {
         paths: [{ params: { tag: 'blog', page: '1' } },],
@@ -25,10 +43,10 @@ export const getStaticProps: GetStaticProps = async (context: GetStaticPropsCont
     const currentPage = context.params?.page?.toString();
 
     const currentTag = context.params?.tag?.toString();
-    
+
     const upperCaseCurrentTag =
         currentTag?.charAt(0).toUpperCase() + currentTag!.slice(1);
-    
+
     const postsByTag = await getPostsByTagAndPage(
         upperCaseCurrentTag,
         parseInt(currentPage!, 10)

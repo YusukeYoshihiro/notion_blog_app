@@ -17,7 +17,12 @@ const notion = new Client({
 
 const n2m = new NotionToMarkdown({ notionClient: notion })
 
-const getTags = (tags: { name: string }[]) => {
+/**
+ * タグの取得
+ * @param tags {　name : string　}
+ * @returns string[]
+ */
+const getTags = (tags: { name: string }[]): string[] => {
     const allTags = tags.map((tag: { name: string }) => {
         return tag.name;
     });
@@ -68,7 +73,9 @@ export const getAllPosts = async (): Promise<(NotionApiCustomPost | undefined)[]
  * @param slug : string
  * @returns Promise<MetaDataAndMarkdown | undefined>
  */
-export const getSinglePost = async (slug: string): Promise<MetaDataAndMarkdown | undefined> => {
+export const getSinglePost = async (
+    slug: string,
+): Promise<MetaDataAndMarkdown | undefined> => {
     try {
         if (!slug) {
             return
@@ -125,7 +132,9 @@ export const getSinglePost = async (slug: string): Promise<MetaDataAndMarkdown |
  * @param pageSize : number
  * @returns Promise<(NotionApiCustomPost | undefined)[]>
  */
-export const getPostsForTopPage = async (pageSize: number): Promise<(NotionApiCustomPost | undefined)[]> => {
+export const getPostsForTopPage = async (
+    pageSize: number,
+): Promise<(NotionApiCustomPost | undefined)[]> => {
     const allPosts = await getAllPosts();
     const TopPagePosts = allPosts.slice(0, pageSize);
     return TopPagePosts
@@ -136,7 +145,9 @@ export const getPostsForTopPage = async (pageSize: number): Promise<(NotionApiCu
  * @param page : number
  * @returns Promise<(NotionApiCustomPost | undefined)[]>
  */
-export const getPostsByPage = async (page: number): Promise<(NotionApiCustomPost | undefined)[]> => {
+export const getPostsByPage = async (
+    page: number,
+): Promise<(NotionApiCustomPost | undefined)[]> => {
     const allPosts = await getAllPosts();
 
     const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
@@ -146,10 +157,10 @@ export const getPostsByPage = async (page: number): Promise<(NotionApiCustomPost
 }
 
 /**
- * 動的にページを取得
+ * 動的にページ数を取得
  * @returns number
  */
-export const getNumberOfPage = async () => {
+export const getNumberOfPage = async (): Promise<number> => {
     const allPosts = await getAllPosts();
 
     const totalPosts = allPosts.length
@@ -163,18 +174,63 @@ export const getNumberOfPage = async () => {
 }
 
 /**
- * タグごとにページを取得
+ * タグごとに記事を取得
+ * @param tagName :string
+ * @param page :number
+ * @returns Promise<(NotionApiCustomPost | undefined)[]>
  */
-export const getPostsByTagAndPage = async (tagName: string, page: number) => {
+export const getPostsByTagAndPage = async (
+    tagName: string,
+    page: number,
+): Promise<(NotionApiCustomPost | undefined)[]> => {
     const allPosts = await getAllPosts();
-    const filteredPosts = allPosts.filter((post) => {
+    const filteredPostsByTag = allPosts.filter((post) => {
         return post?.tags.find((tag: string) => tag === tagName)
     });
-
-    console.log('filteredPost', filteredPosts);
 
     const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
     const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
 
-    return filteredPosts.slice(startIndex, endIndex);
-} 
+    return filteredPostsByTag.slice(startIndex, endIndex);
+}
+
+/**
+ * タグごとにページ数を取得
+ * @param tagName :string
+ * @returns number
+ */
+export const getNumberOfPagesByTag = async (tagName: string): Promise<number> => {
+    const allPosts = await getAllPosts();
+
+    const filteredPostByTag = allPosts.filter((post) => {
+        return post?.tags.find((tag: string) => tag === tagName)
+    });
+
+    const totalPostsByTag = filteredPostByTag.length
+
+    const getNumberOfPagesByTag = Math.floor(totalPostsByTag / NUMBER_OF_POSTS_PER_PAGE)
+        + (totalPostsByTag % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
+
+    return getNumberOfPagesByTag;
+    
+}
+
+/**
+ * 全てのタグを重複なしに取得
+ * @returns Promise<string[]>
+ */
+export const getAllTags = async () => {
+    const allPosts = await getAllPosts();
+
+    // flatMap 二次元配列を一次元配列に下げる
+    const allTagsDuplicationLists = allPosts.flatMap((post) => {
+        return post?.tags
+    });
+
+    // 重複を削除したリストの取得
+    const setArr = new Set(allTagsDuplicationLists);
+    const allTagList = Array.from(setArr);
+    console.log(allTagList);
+
+    return allTagList;
+}
