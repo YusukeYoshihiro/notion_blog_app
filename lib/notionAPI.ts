@@ -211,22 +211,26 @@ export const getNumberOfPagesByTag = async (tagName: string): Promise<number> =>
     const getNumberOfPagesByTag = Math.floor(totalPostsByTag / NUMBER_OF_POSTS_PER_PAGE)
         + (totalPostsByTag % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
 
-    return (
-        getNumberOfPagesByTag
-    )
+    return getNumberOfPagesByTag;
+    
 }
 
+/**
+ * 全てのタグを重複なしに取得
+ * @returns Promise<string[]>
+ */
 export const getAllTags = async () => {
     const allPosts = await getAllPosts();
 
-    const allTagsDuplicationLists = allPosts.map((post) => {
+    // flatMap 二次元配列を一次元配列に下げる
+    const allTagsDuplicationLists = allPosts.flatMap((post) => {
         return post?.tags
     });
 
     // 重複を削除したリストの取得
-    const set = new Set(allTagsDuplicationLists);
-    const allTagsList = Array.from(set);
+    const setArr = new Set(allTagsDuplicationLists);
+    const allTagList = Array.from(setArr);
+    console.log(allTagList);
 
-   console.log(allTagsList);
-   
+    return allTagList;
 }
