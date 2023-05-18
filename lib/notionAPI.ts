@@ -114,7 +114,14 @@ export const getSinglePost = async (
             tags: getTags(page.properties.Tags.multi_select),
         }
 
+        /**
+         * Notion記事のIDを元にNotion記事ブロックを取得し、マークダウン化したもの
+         */
         const mdBlocks = await n2m.pageToMarkdown(page.id);
+
+        /**
+         *  マークダウン化されたNotion記事ブロックを文字列にしたもの
+         * */
         const mdString = n2m.toMarkdownString(mdBlocks);
 
         return {
@@ -123,7 +130,7 @@ export const getSinglePost = async (
         }
     } catch (error) {
         console.log(error);
-        throw new Error('slug is not founded');
+        throw new Error('Failed to retrieved "Single Post by slug" from Notion API.');
     }
 };
 
@@ -135,9 +142,15 @@ export const getSinglePost = async (
 export const getPostsForTopPage = async (
     pageSize: number,
 ): Promise<(NotionApiCustomPost | undefined)[]> => {
-    const allPosts = await getAllPosts();
-    const TopPagePosts = allPosts.slice(0, pageSize);
-    return TopPagePosts
+    try {
+        const allPosts = await getAllPosts();
+        const TopPagePosts = allPosts.slice(0, pageSize);
+        return TopPagePosts
+
+    } catch (error) {
+        console.log(error);
+        throw new Error('Failed to retrieved "Posts For Top Page" from Notion API.')
+    }
 }
 
 /**
@@ -148,12 +161,18 @@ export const getPostsForTopPage = async (
 export const getPostsByPage = async (
     page: number,
 ): Promise<(NotionApiCustomPost | undefined)[]> => {
-    const allPosts = await getAllPosts();
-
-    const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
-    const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
-
-    return allPosts.slice(startIndex, endIndex);
+    try {
+        const allPosts = await getAllPosts();
+    
+        const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
+        const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
+    
+        return allPosts.slice(startIndex, endIndex);
+        
+    } catch (error) {
+        console.log(error);
+        throw new Error('Failed to retrieved "Posts By Page" from Notion API.')
+    }
 }
 
 /**
@@ -200,37 +219,47 @@ export const getPostsByTagAndPage = async (
  * @returns number
  */
 export const getNumberOfPagesByTag = async (tagName: string): Promise<number> => {
-    const allPosts = await getAllPosts();
+    try {
+        const allPosts = await getAllPosts();
 
-    const filteredPostByTag = allPosts.filter((post) => {
-        return post?.tags.find((tag: string) => tag === tagName)
-    });
+        const filteredPostByTag = allPosts.filter((post) => {
+            return post?.tags.find((tag: string) => tag === tagName)
+        });
 
-    const totalPostsByTag = filteredPostByTag.length
+        const totalPostsByTag = filteredPostByTag.length
 
-    const getNumberOfPagesByTag = Math.floor(totalPostsByTag / NUMBER_OF_POSTS_PER_PAGE)
-        + (totalPostsByTag % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
+        const getNumberOfPagesByTag = Math.floor(totalPostsByTag / NUMBER_OF_POSTS_PER_PAGE)
+            + (totalPostsByTag % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
 
-    return getNumberOfPagesByTag;
-    
+        return getNumberOfPagesByTag;
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(`Failed to retrieved "Number Of Pages By Tag" data from Notion API.`)
+    }
 }
 
 /**
  * 全てのタグを重複なしに取得
  * @returns Promise<string[]>
  */
-export const getAllTags = async () => {
-    const allPosts = await getAllPosts();
+export const getAllTags = async (): Promise<(string | undefined)[]> => {
+    try {
+        const allPosts = await getAllPosts();
 
-    // flatMap 二次元配列を一次元配列に下げる
-    const allTagsDuplicationLists = allPosts.flatMap((post) => {
-        return post?.tags
-    });
+        // flatMap: 二次元配列を一次元配列に下げる
+        const allTagsDuplicationLists = allPosts.flatMap((post) => {
+            return post?.tags
+        });
 
-    // 重複を削除したリストの取得
-    const setArr = new Set(allTagsDuplicationLists);
-    const allTagList = Array.from(setArr);
-    console.log(allTagList);
+        // 重複を削除したリストの取得
+        const setArr = new Set(allTagsDuplicationLists);
+        const allTagList = Array.from(setArr);
 
-    return allTagList;
+        return allTagList;
+
+    } catch (error) {
+        console.log(error);
+        throw new Error(`Failed to retrieved "tags" data from Notion API.`)
+    }
 }
