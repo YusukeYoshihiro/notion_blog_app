@@ -59,7 +59,6 @@ const SinglePost: React.FC<SinglePostProp> = (props: SinglePostProp) => {
                                         key={index}
                                     >
                                         <span
-                                            key={index}
                                             className="text-gray-100 
                                             bg-gray-600 
                                             rounded-xl 
@@ -111,7 +110,6 @@ const SinglePost: React.FC<SinglePostProp> = (props: SinglePostProp) => {
                                     key={index}
                                 >
                                     <span
-                                        key={index}
                                         className="text-gray-100 
                                         bg-gray-600 
                                         rounded-xl 
