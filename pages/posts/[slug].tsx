@@ -91,15 +91,17 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
                 <ReactMarkdown
                     // children={markdown.parent}
                     components={{
-                        code({ node, inline, className, children, ...props }) {
+                        code({ inline, className, children }) {
                             const match = /language-(\w+)/.exec(className || '')
                             return !inline && match ? (
                                 <SyntaxHighlighter
-                                    children={String(children).replace(/\n$/, '')}
+                                    // children={String(children).replace(/\n$/, '')}
                                     style={vscDarkPlus}
                                     language={match[1]}
                                     PreTag="div"
-                                />
+                                >
+                                    {String(children).replace(/\n$/, '')}
+                                </SyntaxHighlighter>
                             ) : (
                                 <code>
                                     {children}
