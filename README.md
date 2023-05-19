@@ -1,4 +1,4 @@
-# Notion  Blog App
+# Notion CMS Blog App
 [Demo](https://notion-blog-he5c5koaj-yusukeyoshihiro.vercel.app/)
 
 <img width='650' src="https://github.com/YusukeYoshihiro/notion_blog_app/assets/58486430/a1de592e-9e62-424c-a96e-3bb3edb05a20">
