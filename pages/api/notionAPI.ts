@@ -1,10 +1,9 @@
 import { Client } from '@notionhq/client';
-import { PageObjectResponse, PartialPageObjectResponse, QueryDatabaseResponse, RichTextItemResponse, TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
+import { PageObjectResponse, PartialPageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { NotionToMarkdown } from 'notion-to-md';
 import { MdStringObject } from 'notion-to-md/build/types';
-import { NotionApiCustomPost } from '../common/commonType';
-import { NUMBER_OF_POSTS_PER_PAGE } from '../constants/constants';
-import { log } from 'console';
+import { NotionApiCustomPost } from '../../common/commonType';
+import { NUMBER_OF_POSTS_PER_PAGE } from '../../constants/constants';
 
 interface MetaDataAndMarkdown {
     metaData: NotionApiCustomPost
@@ -192,14 +191,20 @@ export const getPostsByPage = async (
  * @returns number
  */
 export const getNumberOfPage = async (): Promise<number> => {
-    const allPosts = await getAllPosts();
+    try {
+        const allPosts = await getAllPosts();
 
-    const totalPosts = allPosts.length
+        const totalPosts = allPosts.length
 
-    const getNumberOfPage = Math.floor(totalPosts / NUMBER_OF_POSTS_PER_PAGE)
-        + (totalPosts % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
+        const getNumberOfPage = Math.floor(totalPosts / NUMBER_OF_POSTS_PER_PAGE)
+            + (totalPosts % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
 
-    return getNumberOfPage
+        return getNumberOfPage
+
+    } catch (error) {
+        console.log(error);
+        throw new Error('Failed to retrieved "Number Of Page" from Notion API.')
+    }
 }
 
 /**
@@ -212,15 +217,21 @@ export const getPostsByTagAndPage = async (
     tagName: string,
     page: number,
 ): Promise<(NotionApiCustomPost | undefined)[]> => {
-    const allPosts = await getAllPosts();
-    const filteredPostsByTag = allPosts.filter((post) => {
-        return post?.tags.find((tag: string) => tag === tagName)
-    });
+    try {
+        const allPosts = await getAllPosts();
+        const filteredPostsByTag = allPosts.filter((post) => {
+            return post?.tags.find((tag: string) => tag === tagName)
+        });
 
-    const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
-    const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
+        const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
+        const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
 
-    return filteredPostsByTag.slice(startIndex, endIndex);
+        return filteredPostsByTag.slice(startIndex, endIndex);
+
+    } catch (error) {
+        console.log(error);
+        throw new Error('Failed to retrieved "Posts By Tag And Page" from Notion API.')
+    }
 }
 
 /**

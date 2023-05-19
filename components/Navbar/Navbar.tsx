@@ -1,10 +1,11 @@
+import { NextPage } from 'next';
 import Link from 'next/link'
 import React from 'react'
 
 const githubUrl = 'https://github.com/YusukeYoshihiro/';
-const portfolioUrl= 'https://yusukeyoshihiro.com/';
+const portfolioUrl = 'https://yusukeyoshihiro.com/';
 
-const Navbar = () => {
+const Navbar: NextPage = () => {
     return (
         <nav className="container mx-auto lg:px-2 px-5 lg:w-2/5">
             <div className="container flex items-center justify-between mx-auto">

@@ -1,3 +1,4 @@
+import { NextPage } from 'next';
 import Link from 'next/link';
 import React from 'react';
 
@@ -11,7 +12,7 @@ export interface SinglePostProp {
     isPaginationPage: boolean,
 };
 
-const SinglePost: React.FC<SinglePostProp> = (props: SinglePostProp) => {
+const SinglePost: NextPage<SinglePostProp> = (props: SinglePostProp) => {
     const {
         id,
         title,
