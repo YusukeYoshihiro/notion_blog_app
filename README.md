@@ -1,3 +1,33 @@
+# Notion API Blog App
+[Demo](https://notion-blog-he5c5koaj-yusukeyoshihiro.vercel.app/)
+
+<img width='650' src="https://github.com/YusukeYoshihiro/notion_blog_app/assets/58486430/a1de592e-9e62-424c-a96e-3bb3edb05a20">
+
+### 詳細
+　NotionをDBとして、Notionに記載した内容をBlog記事として表示
+### 主要機能
+  - API連携
+    - Notion APIと連携し、CMC化
+  - タグの検索機能
+  - チェックボックスに公開非、公開の設定
+  - 日付順の最新の投稿を表示
+  - ページネーション
+  
+### 技術スタック
+  - Next.js
+  - Typescript
+  - tailwindcss
+  - API
+    - [Notion API](https://developers.notion.com/reference/intro)
+  - ライブラリ
+    - [`react-markdown`](https://www.npmjs.com/package/react-markdown)
+    - [`react-syntax-highlighter`](https://www.npmjs.com/package/react-syntax-highlighter)
+  - 開発環境 & デプロイメント
+    - Git/CLI
+    - Github
+    - Vercel
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
