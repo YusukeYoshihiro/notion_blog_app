@@ -5,6 +5,9 @@
 
 ### 詳細
 　NotionをDBとして、Notionに記載した内容をBlog記事として表示
+ 
+ <img width="800" alt="notion_db" src="https://github.com/YusukeYoshihiro/notion_blog_app/assets/58486430/92b2a075-7b5b-4e53-8391-af1a98229f91">
+
 ### 主要機能
   - API連携
     - Notion APIと連携し、CMC化
