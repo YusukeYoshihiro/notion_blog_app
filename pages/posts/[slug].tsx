@@ -101,7 +101,7 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
                                     {String(children).replace(/\n$/, '')}
                                 </SyntaxHighlighter>
                             ) : (
-                                <code className={className}>
+                                <code>
                                     {children}
                                 </code>
                             )
