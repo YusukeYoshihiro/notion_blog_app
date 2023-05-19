@@ -67,8 +67,12 @@ const SinglePost: React.FC<SinglePostProp> = (props: SinglePostProp) => {
                                             pb-1
                                             font-medium 
                                             mr-2
+                                            border-2 
+                                            border-solid 
+                                            border-teal-900
                                             hover:bg-gray-100 
                                             hover:text-gray-600 
+                                            hover:border-teal-950
                                             duration-300
                                             transition-all
                                             "
@@ -115,6 +119,9 @@ const SinglePost: React.FC<SinglePostProp> = (props: SinglePostProp) => {
                                         pb-1 
                                         font-medium 
                                         mr-2
+                                        border-2 
+                                        border-solid 
+                                        border-teal-900
                                         hover:bg-gray-100 
                                         hover:text-gray-600 
                                         duration-300

@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { getNumberOfPage, getPostsByPage } from '../../../lib/notionAPI'
+import { getAllTags, getNumberOfPage, getPostsByPage } from '../../../lib/notionAPI'
 import SinglePost from '../../../components/Post/SinglePost';
 import {
     GetStaticPaths,
@@ -9,11 +9,13 @@ import {
 } from 'next';
 import { NotionApiCustomPost } from '../../../common/commonType';
 import Pagination from '../../../components/Pagination/Pagination';
+import Tag from '../../../components/Tag/Tag';
 
 interface BlogPageListProps {
     allPosts: NotionApiCustomPost[],
     postsByPage: NotionApiCustomPost[],
     numberOfPage: number,
+    allTags: any[],
 }
 
 interface PageParams {
@@ -47,17 +49,20 @@ export const getStaticProps: GetStaticProps = async (context: GetStaticPropsCont
 
     const numberOfPage = await getNumberOfPage();
 
+    const allTags = await getAllTags();
+
     return {
         props: {
             postsByPage,
             numberOfPage,
+            allTags,
         },
         // ISR 60秒毎に再更新する。※今回は6時間毎
         revalidate: 60 * 60 * 6,
     }
 }
 
-const BlogPageList: NextPage<BlogPageListProps > = ({ postsByPage, numberOfPage }: BlogPageListProps ) => {
+const BlogPageList: NextPage<BlogPageListProps > = ({ postsByPage, numberOfPage, allTags }: BlogPageListProps ) => {
 
     return (
         <>
@@ -90,6 +95,7 @@ const BlogPageList: NextPage<BlogPageListProps > = ({ postsByPage, numberOfPage 
                         numberOfPage={numberOfPage}
                         tag={""}
                     />
+                    <Tag tags={allTags}/>
                 </main>
             </div>
         </>
