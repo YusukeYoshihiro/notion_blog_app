@@ -1,5 +1,9 @@
 import Head from 'next/head'
-import { getAllTags, getNumberOfPage, getPostsByPage } from '../../../lib/notionAPI'
+import { 
+    getAllTags, 
+    getNumberOfPage, 
+    getPostsByPage
+} from '../../api/notionAPI'
 import SinglePost from '../../../components/Post/SinglePost';
 import {
     GetStaticPaths,
@@ -57,12 +61,12 @@ export const getStaticProps: GetStaticProps = async (context: GetStaticPropsCont
             numberOfPage,
             allTags,
         },
-        // ISR 60秒毎に再更新する。※今回は6時間毎
-        revalidate: 60 * 60 * 6,
+        // ISR 10秒毎に再更新する.
+        revalidate: 10,
     }
 }
 
-const BlogPageList: NextPage<BlogPageListProps > = ({ postsByPage, numberOfPage, allTags }: BlogPageListProps ) => {
+const BlogPageList: NextPage<BlogPageListProps> = ({ postsByPage, numberOfPage, allTags }: BlogPageListProps) => {
 
     return (
         <>
@@ -95,7 +99,7 @@ const BlogPageList: NextPage<BlogPageListProps > = ({ postsByPage, numberOfPage,
                         numberOfPage={numberOfPage}
                         tag={""}
                     />
-                    <Tag tags={allTags}/>
+                    <Tag tags={allTags} />
                 </main>
             </div>
         </>

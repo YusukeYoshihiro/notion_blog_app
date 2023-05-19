@@ -1,3 +1,4 @@
+import { NextPage } from 'next';
 import Link from 'next/link'
 import React from 'react'
 
@@ -5,7 +6,7 @@ interface TagsProps {
     tags: string[];
 }
 
-const Tag = (props: TagsProps) => {
+const Tag: NextPage<TagsProps> = (props: TagsProps) => {
     const { tags } = props;
 
     return (

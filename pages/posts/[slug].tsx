@@ -1,5 +1,5 @@
 import React from 'react'
-import { getAllPosts, getSinglePost } from '../../lib/notionAPI'
+import { getAllPosts, getSinglePost } from '../api/notionAPI'
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -38,7 +38,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         props: {
             post,
         },
-        revalidate: 60 * 60 * 6,
+        // ISR 10秒毎に再更新する.
+        revalidate: 10,
     };
 }
 
@@ -50,7 +51,6 @@ type PostProps = {
 }
 
 const Post: NextPage<PostProps> = ({ post }: PostProps) => {
-    // const { metaData, markdown } = post
 
     return (
         <section className="container lg:px-5 px-5 h-screen lg:w-2/5 mx-auto mt-20">
@@ -89,13 +89,11 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
 
             <div className="mt-10 font-medium">
                 <ReactMarkdown
-                    // children={markdown.parent}
                     components={{
                         code({ inline, className, children }) {
                             const match = /language-(\w+)/.exec(className || '')
                             return !inline && match ? (
                                 <SyntaxHighlighter
-                                    // children={String(children).replace(/\n$/, '')}
                                     style={vscDarkPlus}
                                     language={match[1]}
                                     PreTag="div"
@@ -114,7 +112,7 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
                 </ReactMarkdown>
 
                 <Link href={`/`}>
-                    <span 
+                    <span
                         className="text-white
                         text-xl
                         bg-sky-600 

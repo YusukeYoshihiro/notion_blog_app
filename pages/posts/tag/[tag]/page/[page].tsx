@@ -3,7 +3,7 @@ import {
     getAllTags,
     getNumberOfPagesByTag,
     getPostsByTagAndPage
-} from '../../../../../lib/notionAPI'
+} from '../../../../api/notionAPI'
 import SinglePost from '../../../../../components/Post/SinglePost';
 import {
     GetStaticPaths,
@@ -79,8 +79,8 @@ export const getStaticProps: GetStaticProps = async (context: GetStaticPropsCont
             currentTag,
             allTags,
         },
-        // ISR 60秒毎に再更新する。※今回は6時間毎
-        revalidate: 60 * 60 * 6,
+        // ISR 10秒毎に再更新する.
+        revalidate: 10,
     }
 }
 

@@ -1,16 +1,17 @@
 
 import React, { ReactNode } from 'react'
 import Navbar from './Navbar/Navbar'
+import { NextPage } from 'next'
 
-type Props = {
-    children: ReactNode | ReactNode[]
+type LayoutProps = {
+  children: ReactNode | ReactNode[]
 }
 
-const Layout = ({ children }: Props) => {
+const Layout: NextPage<LayoutProps> = ({ children }: LayoutProps) => {
   return (
     <div>
-        <Navbar />
-        {children}
+      <Navbar />
+      {children}
     </div>
   )
 }

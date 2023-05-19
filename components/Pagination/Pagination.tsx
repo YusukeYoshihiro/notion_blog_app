@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import React from 'react'
 import { getPageLink } from '../../lib/blog-helper'
+import { NextPage } from 'next'
 
 interface PaginationProps {
     numberOfPage: number
     tag: string | ""
 }
 
-const Pagination = (props: PaginationProps) => {
+const Pagination: NextPage<PaginationProps> = (props: PaginationProps) => {
     const { numberOfPage, tag } = props;
 
     let pages: number[] = [];
