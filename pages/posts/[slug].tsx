@@ -89,7 +89,6 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
 
             <div className="mt-10 font-medium">
                 <ReactMarkdown
-                    children={markdown.parent}
                     components={{
                         code({ node, inline, className, children }) {
                             const match = /language-(\w+)/.exec(className || '')
@@ -107,7 +106,9 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
                             )
                         }
                     }}
-                ></ReactMarkdown>
+                >
+                    {markdown.parent}
+                </ReactMarkdown>
 
                 <Link href={`/`}>
                     <span 
