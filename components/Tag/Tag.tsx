@@ -36,9 +36,12 @@ const Tag = (props: TagsProps) => {
                                 pb-1 
                                 rounded-xl 
                                 bg-gray-600
-                                inline-block 
+                                inline-block
+                                border-2 
+                                border-solid 
+                                border-sky-900
                                 hover:bg-gray-100 
-                                hover:text-gray-600 
+                                hover:text-gray-600
                                 duration-300
                                 transition-all
                                 "

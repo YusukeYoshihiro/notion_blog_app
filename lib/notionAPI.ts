@@ -38,6 +38,18 @@ export const getAllPosts = async (): Promise<(NotionApiCustomPost | undefined)[]
         const posts = await notion.databases.query({
             database_id: process.env.NOTION_DATABASE_ID || '',
             page_size: 100,
+            filter: {
+                property: "Published",
+                checkbox: {
+                    equals: true,
+                }
+            },
+            sorts: [
+                {
+                    property: "Date",
+                    direction: "descending",
+                }
+            ]
         });
         const allPosts: (PageObjectResponse | PartialPageObjectResponse)[] = posts.results;
 
@@ -163,12 +175,12 @@ export const getPostsByPage = async (
 ): Promise<(NotionApiCustomPost | undefined)[]> => {
     try {
         const allPosts = await getAllPosts();
-    
+
         const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
         const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
-    
+
         return allPosts.slice(startIndex, endIndex);
-        
+
     } catch (error) {
         console.log(error);
         throw new Error('Failed to retrieved "Posts By Page" from Notion API.')

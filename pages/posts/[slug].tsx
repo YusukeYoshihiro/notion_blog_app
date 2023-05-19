@@ -66,7 +66,7 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
                     <p
                         key={index}
                         className="text-white 
-                        border 
+                        border-2
                         border-solid 
                         border-teal-900
                         bg-teal-900 
@@ -111,7 +111,27 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
                 ></ReactMarkdown>
 
                 <Link href={`/`}>
-                    <span className='text-white bg-sky-600 rounded-xl font-medium px-2 inline-block mr-2" mx-3'>←ホームに戻る</span>
+                    <span 
+                        className="text-white
+                        text-xl
+                        bg-sky-600 
+                        rounded-xl 
+                        font-medium 
+                        px-2 
+                        inline-block 
+                        mr-2
+                        mx-3 
+                        mt-10
+                        border-2 
+                        border-solid 
+                        border-sky-900
+                        hover:bg-white 
+                        hover:text-sky-600 
+                        duration-300 
+                        transition-all"
+                    >
+                        ←ホームに戻る
+                    </span>
                 </Link>
             </div>
         </section>

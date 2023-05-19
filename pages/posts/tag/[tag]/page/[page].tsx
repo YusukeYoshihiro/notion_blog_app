@@ -14,12 +14,13 @@ import {
 import { NotionApiCustomPost } from '../../../../../common/commonType';
 import Pagination from '../../../../../components/Pagination/Pagination';
 import { ParsedUrlQuery } from 'querystring';
+import Tag from '../../../../../components/Tag/Tag';
 
 interface BlogTagPageListProps {
-    allPosts: NotionApiCustomPost[],
     postsByTag: NotionApiCustomPost[],
     numberOfPagesByTag: number,
     currentTag: string,
+    allTags: string[],
 }
 
 interface TagParams {
@@ -69,18 +70,26 @@ export const getStaticProps: GetStaticProps = async (context: GetStaticPropsCont
 
     const numberOfPagesByTag = await getNumberOfPagesByTag(upperCaseCurrentTag);
 
+    const allTags = await getAllTags();
+
     return {
         props: {
             postsByTag,
             numberOfPagesByTag,
             currentTag,
+            allTags,
         },
         // ISR 60秒毎に再更新する。※今回は6時間毎
         revalidate: 60 * 60 * 6,
     }
 }
 
-const BlogTagPageList: NextPage<BlogTagPageListProps> = ({ postsByTag, numberOfPagesByTag, currentTag }: BlogTagPageListProps) => {
+const BlogTagPageList: NextPage<BlogTagPageListProps> = ({
+    postsByTag,
+    numberOfPagesByTag,
+    currentTag,
+    allTags,
+}: BlogTagPageListProps) => {
 
     return (
         <>
@@ -113,6 +122,7 @@ const BlogTagPageList: NextPage<BlogTagPageListProps> = ({ postsByTag, numberOfP
                         numberOfPage={numberOfPagesByTag}
                         tag={currentTag}
                     />
+                    <Tag tags={allTags} />
                 </main>
             </div>
         </>
