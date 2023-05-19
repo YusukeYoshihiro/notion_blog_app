@@ -187,9 +187,7 @@ export const getNumberOfPage = async (): Promise<number> => {
     const getNumberOfPage = Math.floor(totalPosts / NUMBER_OF_POSTS_PER_PAGE)
         + (totalPosts % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1 : 0)
 
-    return (
-        getNumberOfPage
-    )
+    return getNumberOfPage
 }
 
 /**

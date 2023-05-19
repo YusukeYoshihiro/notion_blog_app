@@ -1,21 +1,26 @@
 import Head from 'next/head'
-import { getAllPosts, getPostsForTopPage } from '../lib/notionAPI'
+import { getAllPosts, getAllTags, getPostsForTopPage } from '../lib/notionAPI'
 import SinglePost from '../components/Post/SinglePost';
 import { GetStaticProps } from 'next';
 import { NotionApiCustomPost } from '../common/commonType';
 import Link from 'next/link';
+import Tag from '../components/Tag/Tag';
 
 interface HomeProps {
   allPosts: NotionApiCustomPost[]
+  allTags: string[],
 }
 
 // SSG
 export const getStaticProps: GetStaticProps = async () => {
   const allPosts = await getPostsForTopPage(4);
 
+  const allTags = await getAllTags();
+
   return {
     props: {
       allPosts,
+      allTags,
     },
     // ISR 60秒毎に再更新する。※今回は6時間毎
     revalidate: 60 * 60 * 6,
@@ -23,7 +28,7 @@ export const getStaticProps: GetStaticProps = async () => {
 }
 
 const Home: React.FC<HomeProps> = (props: HomeProps) => {
-  const { allPosts } = props
+  const { allPosts, allTags } = props
 
   return (
     <>
@@ -56,6 +61,7 @@ const Home: React.FC<HomeProps> = (props: HomeProps) => {
           >
             ...もっと見る
           </Link>
+          <Tag tags={allTags}/>
         </main>
       </div>
     </>

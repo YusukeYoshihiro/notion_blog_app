@@ -1,39 +1,54 @@
 import Head from 'next/head'
-import { getAllPosts, getAllTags, getNumberOfPage, getNumberOfPagesByTag, getPostsByPage, getPostsByTagAndPage, getPostsForTopPage } from '../../../../../lib/notionAPI'
+import {
+    getAllTags,
+    getNumberOfPagesByTag,
+    getPostsByTagAndPage
+} from '../../../../../lib/notionAPI'
 import SinglePost from '../../../../../components/Post/SinglePost';
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from 'next';
+import {
+    GetStaticPaths,
+    GetStaticProps,
+    GetStaticPropsContext,
+    NextPage
+} from 'next';
 import { NotionApiCustomPost } from '../../../../../common/commonType';
 import Pagination from '../../../../../components/Pagination/Pagination';
+import { ParsedUrlQuery } from 'querystring';
 
-interface HomeProps {
+interface BlogTagPageListProps {
     allPosts: NotionApiCustomPost[],
     postsByTag: NotionApiCustomPost[],
-    numberOfPage: number,
+    numberOfPagesByTag: number,
+    currentTag: string,
+}
+
+interface TagParams {
+    params: {
+        tag: string | undefined,
+        page: string,
+    } | ParsedUrlQuery
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const tags = getAllTags();
+    const allTags: (string | undefined)[] = await getAllTags();
 
-    const numberOfPageByTag = await getNumberOfPagesByTag('Blog');
+    let params: TagParams[] = [];
+    // 複数回の非同期処理を行う際は Promise.all()で囲う。
+    await Promise.all(
+        allTags.map((tag: string | undefined) => {
+            const paths: Promise<void> = getNumberOfPagesByTag(tag!)
+                .then((numberOfPageByTag: number) => {
+                    for (let i = 1; i <= numberOfPageByTag; i++) {
+                        params.push({ params: { tag: tag, page: i.toString() } })
 
-    /**
-     *  [
-            { params: { tag: 'blog', page: '1' },
-            { params: { tag: 'blog', page: '2' },
-            { params: { tag: 'blog', page: '3' },
-            ......
-        ],
-     */
-    let params = [];
-    for (let i = 1; i <= numberOfPageByTag; i++) {
-        params.push({ params: { tag: 'Blog', page: i.toString() } })
-
-    }
-    // console.log(params);
-
+                    }
+                });
+            return paths
+        })
+    )
 
     return {
-        paths: [{ params: { tag: 'blog', page: '1' } },],
+        paths: params,
         fallback: 'blocking'
     }
 }
@@ -52,16 +67,20 @@ export const getStaticProps: GetStaticProps = async (context: GetStaticPropsCont
         parseInt(currentPage!, 10)
     );
 
+    const numberOfPagesByTag = await getNumberOfPagesByTag(upperCaseCurrentTag);
+
     return {
         props: {
             postsByTag,
+            numberOfPagesByTag,
+            currentTag,
         },
         // ISR 60秒毎に再更新する。※今回は6時間毎
         revalidate: 60 * 60 * 6,
     }
 }
 
-const BlogTagPageList: React.FC<HomeProps> = ({ postsByTag, numberOfPage }: HomeProps) => {
+const BlogTagPageList: NextPage<BlogTagPageListProps> = ({ postsByTag, numberOfPagesByTag, currentTag }: BlogTagPageListProps) => {
 
     return (
         <>
@@ -90,7 +109,10 @@ const BlogTagPageList: React.FC<HomeProps> = ({ postsByTag, numberOfPage }: Home
                             </div>
                         ))}
                     </section>
-                    <Pagination numberOfPage={numberOfPage} />
+                    <Pagination
+                        numberOfPage={numberOfPagesByTag}
+                        tag={currentTag}
+                    />
                 </main>
             </div>
         </>

@@ -59,7 +59,32 @@ const Post: NextPage<PostProps> = ({ post }: PostProps) => {
             <span className="text-gray-500">Post date at {metaData.date}</span>
             <br />
             {metaData.tags.map((tag: string, index: number) => (
-                <p key={index} className="text-white bg-teal-900 rounded-xl font-medium mt-2 px-2 inline-block mr-2">{tag}</p>
+                <Link
+                    href={`/posts/tag/${tag}/page/1`}
+                    key={index}
+                >
+                    <p
+                        key={index}
+                        className="text-white 
+                        border 
+                        border-solid 
+                        border-teal-900
+                        bg-teal-900 
+                        rounded-xl 
+                        font-medium
+                        mt-2 
+                        px-2 
+                        inline-block
+                        mr-2
+                        hover:bg-white 
+                        hover:text-teal-900 
+                        hover:border-teal-900
+                        duration-300
+                        transition-all"
+                    >
+                        {tag}
+                    </p>
+                </Link>
             ))}
 
             <div className="mt-10 font-medium">
