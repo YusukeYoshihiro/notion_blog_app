@@ -1,28 +1,31 @@
 import Head from 'next/head'
-import { getAllPosts, getNumberOfPage, getPostsByPage, getPostsForTopPage } from '../../../lib/notionAPI'
+import { getNumberOfPage, getPostsByPage } from '../../../lib/notionAPI'
 import SinglePost from '../../../components/Post/SinglePost';
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from 'next';
+import {
+    GetStaticPaths,
+    GetStaticProps,
+    GetStaticPropsContext,
+    NextPage
+} from 'next';
 import { NotionApiCustomPost } from '../../../common/commonType';
 import Pagination from '../../../components/Pagination/Pagination';
 
-interface HomeProps {
+interface BlogPageListProps {
     allPosts: NotionApiCustomPost[],
     postsByPage: NotionApiCustomPost[],
     numberOfPage: number,
 }
 
+interface PageParams {
+    params: {
+        page: string
+    },
+}
+
 export const getStaticPaths: GetStaticPaths = async () => {
     const numberOfPage = await getNumberOfPage();
 
-    /**
-     *  [
-            { params: { page: '1' } }, 
-            { params: { page: '2' } },
-            { params: { page: '3' } },
-            ......
-        ],
-     */
-    let params = [];
+    let params: PageParams[] = [];
     for (let i = 1; i <= numberOfPage; i++) {
         params.push({ params: { page: i.toString() } })
 
@@ -54,7 +57,7 @@ export const getStaticProps: GetStaticProps = async (context: GetStaticPropsCont
     }
 }
 
-const BlogPageList: React.FC<HomeProps> = ({ postsByPage, numberOfPage }: HomeProps) => {
+const BlogPageList: NextPage<BlogPageListProps > = ({ postsByPage, numberOfPage }: BlogPageListProps ) => {
 
     return (
         <>
@@ -83,7 +86,10 @@ const BlogPageList: React.FC<HomeProps> = ({ postsByPage, numberOfPage }: HomePr
                             </div>
                         ))}
                     </section>
-                    <Pagination numberOfPage={numberOfPage} />
+                    <Pagination
+                        numberOfPage={numberOfPage}
+                        tag={""}
+                    />
                 </main>
             </div>
         </>
